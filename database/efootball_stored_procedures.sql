@@ -185,6 +185,7 @@ END$$
 -- ------------------------------------------------------------
 -- sp_create_user
 -- Inscrit un nouvel utilisateur (le hash password vient du PHP)
+-- id_role = 1 (player) par défaut — seul un admin peut promouvoir
 -- Retourne : id_user généré
 -- ------------------------------------------------------------
 CREATE PROCEDURE sp_create_user(
@@ -194,8 +195,13 @@ CREATE PROCEDURE sp_create_user(
     OUT p_id_user  INT
 )
 BEGIN
-    INSERT INTO users (email, username, password, role)
-    VALUES (p_email, p_username, p_password, 'player');
+    -- id_role 1 = player (défaut) — récupéré depuis la table role pour éviter le hardcode
+    DECLARE v_id_role INT;
+
+    SELECT id_role INTO v_id_role FROM role WHERE nom = 'player' LIMIT 1;
+
+    INSERT INTO users (email, username, password, id_role)
+    VALUES (p_email, p_username, p_password, v_id_role);
 
     SET p_id_user = LAST_INSERT_ID();
 END$$
@@ -203,27 +209,47 @@ END$$
 
 -- ------------------------------------------------------------
 -- sp_get_user_by_email
--- Récupère un utilisateur par son email (connexion)
--- Retourne : ligne complète de users
+-- Récupère un utilisateur par son email (connexion / auth)
+-- Retourne : données utilisateur + nom du rôle (JOIN role)
+-- Le JOIN role évite de stocker la chaîne 'admin'/'player'
+-- directement dans la session — on lit le nom depuis la DB
 -- ------------------------------------------------------------
 CREATE PROCEDURE sp_get_user_by_email(IN p_email VARCHAR(100))
 BEGIN
-    SELECT id_user, email, password, username, role, is_banned, created_at
-    FROM   users
-    WHERE  email = p_email
+    SELECT
+        u.id_user,
+        u.email,
+        u.password,
+        u.username,
+        u.id_role,
+        r.nom      AS role,               -- nom lisible du rôle pour la session
+        u.is_banned,
+        u.created_at
+    FROM   users u
+    JOIN   role  r ON u.id_role = r.id_role
+    WHERE  u.email = p_email
     LIMIT  1;
 END$$
 
 
 -- ------------------------------------------------------------
 -- sp_get_user_by_id
--- Récupère un utilisateur par son id (profil, session)
+-- Récupère un utilisateur par son id (profil, vérification session)
+-- Retourne : données utilisateur + nom du rôle (JOIN role)
 -- ------------------------------------------------------------
 CREATE PROCEDURE sp_get_user_by_id(IN p_id_user INT)
 BEGIN
-    SELECT id_user, email, username, role, is_banned, created_at
-    FROM   users
-    WHERE  id_user = p_id_user
+    SELECT
+        u.id_user,
+        u.email,
+        u.username,
+        u.id_role,
+        r.nom      AS role,               -- nom lisible du rôle
+        u.is_banned,
+        u.created_at
+    FROM   users u
+    JOIN   role  r ON u.id_role = r.id_role
+    WHERE  u.id_user = p_id_user
     LIMIT  1;
 END$$
 
@@ -237,6 +263,28 @@ BEGIN
     UPDATE users
     SET    is_banned = p_banned
     WHERE  id_user   = p_id_user;
+END$$
+
+
+-- ------------------------------------------------------------
+-- sp_set_user_role
+-- Change le rôle d'un utilisateur (admin uniquement)
+-- p_role_nom : 'player' | 'admin' | tout futur rôle ajouté
+-- ------------------------------------------------------------
+CREATE PROCEDURE sp_set_user_role(IN p_id_user INT, IN p_role_nom VARCHAR(50))
+BEGIN
+    DECLARE v_id_role INT;
+
+    SELECT id_role INTO v_id_role FROM role WHERE nom = p_role_nom LIMIT 1;
+
+    IF v_id_role IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Rôle inconnu — vérifier la table role';
+    END IF;
+
+    UPDATE users
+    SET    id_role = v_id_role
+    WHERE  id_user = p_id_user;
 END$$
 
 
@@ -954,9 +1002,10 @@ DELIMITER ;
 -- PROCÉDURES USERS (CALL sp_xxx(...))
 -- ─────────────────────────────────────────────────────────────
 -- sp_create_user(email, username, password, OUT id_user)
--- sp_get_user_by_email(email)
--- sp_get_user_by_id(id_user)
+-- sp_get_user_by_email(email)         → retourne aussi r.nom AS role (JOIN role)
+-- sp_get_user_by_id(id_user)          → retourne aussi r.nom AS role (JOIN role)
 -- sp_ban_user(id_user, 1|0)
+-- sp_set_user_role(id_user, role_nom) → 'player' | 'admin'
 --
 -- PROCÉDURES CUPS
 -- ─────────────────────────────────────────────────────────────

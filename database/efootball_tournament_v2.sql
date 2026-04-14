@@ -1,14 +1,41 @@
 -- ============================================================
 -- BASE DE DONNÉES : efootball_tournament
--- Version : 2.0
--- Changements : suppression bracket_slot, ajout avance_vers sur matche,
---               ajout id_cup sur matche, ajout trophee et remporte
+-- Version : 3.0
+-- Changements v2 : suppression bracket_slot, ajout avance_vers sur matche,
+--                  ajout id_cup sur matche, ajout trophee et remporte
+-- Changements v3 : role séparé en table dédiée (normalisation)
+--                  users.role ENUM → users.id_role FK → role.id_role
 -- ============================================================
 CREATE DATABASE efootball_tournament
   CHARACTER SET utf8mb4                -- support complet de l'unicode (accents, arabes, emojis...)
   COLLATE utf8mb4_unicode_ci;          -- règles de tri insensibles à la casse (ci = case insensitive)
 
 USE efootball_tournament;              -- sélectionne la base pour toutes les prochaines commandes
+
+
+-- ============================================================
+-- TABLE : role
+-- Description : rôles globaux disponibles sur la plateforme
+--               séparé de users pour faciliter les jointures
+--               et permettre d'ajouter des rôles sans ALTER TABLE
+-- Ordre       : doit être créé AVANT users (FK users → role)
+-- ============================================================
+CREATE TABLE role (
+
+  -- Colonnes
+  id_role INT         NOT NULL AUTO_INCREMENT,                            -- identifiant unique
+  nom     VARCHAR(50) NOT NULL,                                           -- nom du rôle : 'admin', 'player'...
+
+  -- Contraintes
+  CONSTRAINT pk_role     PRIMARY KEY (id_role),
+  CONSTRAINT uq_role_nom UNIQUE (nom)                                     -- nom de rôle unique
+
+);
+
+-- Données initiales — les deux rôles de base de la plateforme
+-- id_role 1 = player (défaut pour tout nouvel utilisateur)
+-- id_role 2 = admin
+INSERT INTO role (nom) VALUES ('player'), ('admin');
 
 
 -- ============================================================
@@ -22,13 +49,14 @@ CREATE TABLE users (
   email      VARCHAR(100) NOT NULL,                                       -- adresse email de connexion
   password   VARCHAR(255) NOT NULL,                                       -- hash du mot de passe (bcrypt)
   username   VARCHAR(50)  NOT NULL,                                       -- nom affiché publiquement
-  role       ENUM('admin', 'player') NOT NULL DEFAULT 'player',           -- rôle global sur la plateforme
+  id_role    INT          NOT NULL DEFAULT 1,                             -- FK vers role (1 = player par défaut)
   is_banned  BOOLEAN      NOT NULL DEFAULT FALSE,                         -- compte banni ou non
   created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,             -- date d'inscription
 
   -- Contraintes
   -- NOTE MySQL : le nom des contraintes PRIMARY KEY est ignoré (toujours 'PRIMARY' en interne) — warning 1280 normal
   CONSTRAINT pk_users          PRIMARY KEY (id_user),                     -- clé primaire
+  CONSTRAINT fk_users_id_role  FOREIGN KEY (id_role) REFERENCES role(id_role),
   CONSTRAINT uq_users_email    UNIQUE (email),                            -- email unique
   CONSTRAINT uq_users_username UNIQUE (username)                          -- username unique
 
