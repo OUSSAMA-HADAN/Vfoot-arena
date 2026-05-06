@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+build/
+.DS_Store
+*.user
+CMakeLists.txt.user
+=======
 # ============================================================
 # PHP — VFoot Arena (web/)
 # ============================================================
@@ -86,3 +92,4 @@ admin/.idea/
 *.cbp
 *.layout
 *.depend
+>>>>>>> cc0f61de36bb8aa4c59d84fb19ceafef0b0cc82b
