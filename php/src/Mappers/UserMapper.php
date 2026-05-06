@@ -6,11 +6,11 @@ namespace App\Mappers;
 
 use App\Entities\User;
 
-// Converts raw PDO result rows into User entity objects.
-// The only place that knows both DB column names and User entity setters.
+// Transforme les lignes PDO brutes en objets User.
+// Seul endroit qui connaît les noms des colonnes SQL et les setters de User.
 class UserMapper
 {
-    // Hydrates a single User entity from one associative PDO row.
+    // Remplit un objet User depuis une ligne PDO associative.
     public function map(array $row): User
     {
         $user = new User();

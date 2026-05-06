@@ -21,7 +21,7 @@ abstract class AbstractController
     #[Inject]
     private RendererInterface $renderer;
 
-    // Renders a template and returns a 200 PSR-7 response.
+    // Rendu d'un template — retourne une réponse PSR-7 200.
     public function render(string $template, array $data = []): ResponseInterface
     {
         $contents = $this->renderer->render($template, $data);
@@ -31,8 +31,8 @@ abstract class AbstractController
         return $response->withBody($stream);
     }
 
-    // Returns a 302 redirect response to the given URL.
-    // Available to all controllers that extend this class.
+    // Retourne une réponse de redirection 302 vers l'URL donnée.
+    // Disponible pour tous les controllers qui étendent cette classe.
     protected function redirect(string $url): ResponseInterface
     {
         return $this->responseFactory

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entities;
 
-// Represents an authenticated user.
-// Plain PHP object — no database knowledge, only data and accessors.
+// Représente un utilisateur authentifié.
+// Objet PHP pur — aucune connaissance de la base de données.
 class User
 {
     private int $id;

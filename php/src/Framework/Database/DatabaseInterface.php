@@ -6,10 +6,10 @@ namespace Framework\Database;
 
 use PDO;
 
-// Contract for the database connection manager.
-// Any class that provides a PDO connection must implement this.
+// Contrat pour le gestionnaire de connexion à la base de données.
+// Toute classe fournissant une connexion PDO doit implémenter cette interface.
 interface DatabaseInterface
 {
-    // Returns the active PDO connection, creating it if it doesn't exist yet.
+    // Retourne la connexion PDO active, la crée si elle n'existe pas encore.
     public function getConnection(): PDO;
 }

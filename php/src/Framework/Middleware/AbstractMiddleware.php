@@ -10,24 +10,23 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-// Base class for all middleware in the framework.
-// Provides a ResponseFactory for building redirect or error responses,
-// and enforces the PSR-15 MiddlewareInterface contract on all children.
+// Classe de base pour tous les middleware du framework.
+// Fournit une ResponseFactory pour construire des redirections ou erreurs,
+// et impose le contrat PSR-15 MiddlewareInterface à toutes les classes filles.
 abstract class AbstractMiddleware implements MiddlewareInterface
 {
-    // Used by child middleware to create redirect or custom responses.
+    // Utilisé par les middleware enfants pour créer des réponses de redirection.
     public function __construct(protected ResponseFactoryInterface $responseFactory){}
 
-    // Must be implemented by each concrete middleware.
-    // Call $handler->handle($request) to pass the request down the chain,
-    // or return a response directly to short-circuit (e.g. redirect to /login).
+    // Doit être implémenté par chaque middleware concret.
+    // Appeler $handler->handle($request) pour passer au suivant,
+    // ou retourner une réponse directement pour court-circuiter (ex: redirect /login).
     abstract public function process(
         ServerRequestInterface  $request,
         RequestHandlerInterface $handler
     ): ResponseInterface;
 
-    // Helper: creates a redirect response to the given URL.
-    // Used by child middleware to redirect without boilerplate.
+    // Crée une réponse de redirection vers l'URL donnée.
     protected function redirect(string $url): ResponseInterface
     {
         return $this->responseFactory

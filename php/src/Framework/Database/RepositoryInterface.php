@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Framework\Database;
 
-// Base marker interface for all repositories.
-// Every repository in the app must implement this, allowing type-safe
-// collection and injection of repositories through the DI container.
+// Interface marqueur de base pour tous les repositories.
+// Chaque repository doit l'implémenter pour permettre l'injection via le conteneur DI.
 interface RepositoryInterface
 {
 }

@@ -9,28 +9,27 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-// Protects routes that require an authenticated user.
-// If no valid session exists, the request is redirected to /login.
-// If authenticated, the request passes through to the next handler (controller).
+// Protège les routes qui nécessitent un utilisateur connecté.
+// Si aucune session valide n'existe, redirige vers /login.
+// Si connecté, laisse passer la requête vers le controller suivant.
 class AuthMiddleware extends AbstractMiddleware
 {
     public function process(
         ServerRequestInterface  $request,
         RequestHandlerInterface $handler
     ): ResponseInterface {
-        // Start the session if one is not already active.
+        // Démarre la session si elle n'est pas encore active.
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        // Check for an authenticated user in the session.
-        // $_SESSION['user_id'] is set by LoginController on successful login.
+        // Vérifie qu'un utilisateur est connecté en session.
         if (empty($_SESSION['user_id'])) {
-            // No active session — redirect to login and stop the chain.
+            // Pas de session — redirige vers /login et stoppe la chaîne.
             return $this->redirect('/login');
         }
 
-        // User is authenticated — pass the request to the next middleware or controller.
+        // Utilisateur connecté — passe la requête au controller suivant.
         return $handler->handle($request);
     }
 }

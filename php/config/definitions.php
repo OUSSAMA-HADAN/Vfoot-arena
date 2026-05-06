@@ -21,29 +21,26 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 return [
-    // HTTP: binds PSR-17 factory interfaces to Guzzle's HttpFactory implementation.
-    // ResponseFactoryInterface::class => DI\create(Psr17Factory::class)
+    // HTTP : lie les interfaces PSR-17 à l'implémentation HttpFactory de Guzzle.
     ResponseFactoryInterface::class  => DI\create(HttpFactory::class),
     StreamFactoryInterface::class    => DI\create(HttpFactory::class),
 
-    // Templating: PlatesRenderer wraps the League Plates engine.
+    // Templates : PlatesRenderer encapsule le moteur League Plates.
     RendererInterface::class         => DI\create(PlatesRenderer::class),
 
-    // Database: single shared PDO connection, lazy-initialized on first use.
+    // Base de données : connexion PDO unique partagée, créée au premier appel.
     DatabaseInterface::class         => DI\create(Database::class),
 
-    // Repositories: autowire resolves constructor parameters by type automatically.
-    // DI\create() does not auto-wire — DI\autowire() is required for constructor injection.
+    // Repositories : autowire résout les paramètres du constructeur automatiquement.
 
-
-    // Repositories: User
+    // Repositories : User
     UserRepositoryInterface::class   => DI\autowire(UserRepository::class),
 
-    // Repositories: VFoot domain
+    // Repositories : domaine VFoot
     CupRepositoryInterface::class    => DI\autowire(CupRepository::class),
     GroupRepositoryInterface::class  => DI\autowire(GroupRepository::class),
     MatcheRepositoryInterface::class => DI\autowire(MatcheRepository::class),
 
-    // Middleware: autowire injects ResponseFactoryInterface via the constructor.
+    // Middleware : autowire injecte ResponseFactoryInterface via le constructeur.
     AuthMiddleware::class => DI\autowire(AuthMiddleware::class),
 ];

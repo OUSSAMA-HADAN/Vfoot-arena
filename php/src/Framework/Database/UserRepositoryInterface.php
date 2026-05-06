@@ -6,15 +6,15 @@ namespace Framework\Database;
 
 use App\Entities\User;
 
-// Contract for all user data access operations.
+// Contrat pour toutes les opérations d'accès aux données utilisateur.
 interface UserRepositoryInterface extends RepositoryInterface
 {
-    // Finds a user by their email address — used during login to retrieve the stored hash.
+    // Trouve un utilisateur par son email — utilisé lors de la connexion.
     public function findByEmail(string $email): ?User;
 
-    // Finds a user by their ID — used to rehydrate the user from the session.
+    // Trouve un utilisateur par son ID — utilisé pour recharger la session.
     public function findById(int $id): ?User;
 
-    // Creates a new user with the given email, username and bcrypt-hashed password.
+    // Crée un nouvel utilisateur avec email, username et mot de passe hashé bcrypt.
     public function create(string $email, string $username, string $hashedPassword): void;
 }

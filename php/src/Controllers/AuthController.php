@@ -10,22 +10,22 @@ use Framework\Database\UserRepositoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-// Handles login, registration, and logout.
-// No auth middleware applied to these routes — they must stay public.
+// Gère la connexion, l'inscription et la déconnexion.
+// Pas de middleware auth sur ces routes — elles restent publiques.
 class AuthController extends AbstractController
 {
-    // Injected by PHP-DI — resolves to UserRepository via definitions.php.
+    // Injecté par PHP-DI — résolu vers UserRepository via definitions.php.
     #[Inject]
     private UserRepositoryInterface $userRepository;
 
-    // Shows the login form.
+    // Affiche le formulaire de connexion.
     public function showLogin(): ResponseInterface
     {
         return $this->render('auth/login', []);
     }
 
-    // Handles login form submission.
-    // Verifies credentials, sets the session, and redirects on success.
+    // Traite la soumission du formulaire de connexion.
+    // Vérifie les identifiants, ouvre la session et redirige.
     public function login(ServerRequestInterface $request): ResponseInterface
     {
         $body     = $request->getParsedBody();
@@ -34,7 +34,7 @@ class AuthController extends AbstractController
 
         $user = $this->userRepository->findByEmail($email);
 
-        // Verify the submitted password against the stored bcrypt hash.
+        // Vérifie le mot de passe soumis contre le hash bcrypt stocké.
         if ($user === null || !password_verify($password, $user->getPassword())) {
             return $this->render('auth/login', [
                 'error' => 'Invalid email or password.',
@@ -47,14 +47,14 @@ class AuthController extends AbstractController
         return $this->redirect('/cups');
     }
 
-    // Shows the registration form.
+    // Affiche le formulaire d'inscription.
     public function showRegister(): ResponseInterface
     {
         return $this->render('auth/register', []);
     }
 
-    // Handles registration form submission.
-    // Hashes the password and creates the user, then redirects to login.
+    // Traite la soumission du formulaire d'inscription.
+    // Hash le mot de passe, crée le compte et redirige vers la connexion.
     public function register(ServerRequestInterface $request): ResponseInterface
     {
         $body     = $request->getParsedBody();
@@ -87,7 +87,7 @@ class AuthController extends AbstractController
         return $this->redirect('/login');
     }
 
-    // Destroys the session and redirects to the login page.
+    // Détruit la session et redirige vers la page de connexion.
     public function logout(): ResponseInterface
     {
         $_SESSION = [];

@@ -13,14 +13,14 @@ use League\Route\RouteGroup;
 use League\Route\Router;
 use Psr\Container\ContainerInterface;
 
-// All application routes are registered here.
-// The $container is passed in so middleware can be resolved with dependencies injected by PHP-DI.
+// Toutes les routes de l'application sont définies ici.
+// Le $container est passé pour que les middleware soient résolus via PHP-DI.
 return function (Router $router, ContainerInterface $container) {
 
     $authMiddleware = $container->get(AuthMiddleware::class);
 
     // -------------------------------------------------------
-    // Public routes — no authentication required
+    // Routes publiques — aucune authentification requise
     // -------------------------------------------------------
     $router->get('/', [HomeController::class, 'index']);
     $router->get('/login',    [AuthController::class, 'showLogin']);
@@ -30,7 +30,7 @@ return function (Router $router, ContainerInterface $container) {
     $router->get('/logout',   [AuthController::class, 'logout']);
 
     // -------------------------------------------------------
-    // Protected routes — AuthMiddleware checks session first
+    // Routes protégées — AuthMiddleware vérifie la session
     // -------------------------------------------------------
     $router->group('', function (RouteGroup $router) {
 
@@ -39,12 +39,12 @@ return function (Router $router, ContainerInterface $container) {
         $router->get('/cups/{id:number}',          [CupController::class, 'show']);
         $router->post('/cups/{id:number}/join',    [CupController::class, 'join']);
 
-        // Matches
+        // Matchs
         $router->get('/matches',                       [MatcheController::class, 'index']);
         $router->get('/matches/{id:number}',           [MatcheController::class, 'show']);
         $router->post('/matches/{id:number}/score',    [MatcheController::class, 'submitScore']);
 
-        // Profile
+        // Profil
         $router->get('/profile', [ProfileController::class, 'show']);
 
     })->middleware($authMiddleware);
