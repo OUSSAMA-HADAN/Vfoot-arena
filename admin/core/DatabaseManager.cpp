@@ -7,8 +7,6 @@ DatabaseManager& DatabaseManager::instance() {
     return inst;
 }
 
-DatabaseManager::DatabaseManager(QObject* parent) : QObject(parent) {}
-
 bool DatabaseManager::connect(const QString& host, int port,
                                const QString& dbName,
                                const QString& user, const QString& password) {
