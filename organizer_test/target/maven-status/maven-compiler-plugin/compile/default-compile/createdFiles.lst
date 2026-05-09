@@ -1,0 +1,16 @@
+vfoot\view\IMatchView.class
+vfoot\model\Match.class
+vfoot\view\ICupView.class
+vfoot\view\console\ConsoleDashboardView.class
+vfoot\presenter\CupPresenter.class
+vfoot\model\Cup.class
+vfoot\repository\MatchRepository.class
+vfoot\view\console\ConsoleCupView.class
+vfoot\presenter\MatchPresenter.class
+vfoot\view\IDashboardView.class
+vfoot\view\console\ConsoleMatchView.class
+vfoot\config\Database.class
+vfoot\repository\CupRepository.class
+vfoot\presenter\DashboardPresenter.class
+vfoot\Main.class
+vfoot\model\User.class

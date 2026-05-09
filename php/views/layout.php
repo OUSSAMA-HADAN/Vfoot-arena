@@ -99,9 +99,11 @@
         .form-label { color: #94a3b8; font-size: .85rem; font-weight: 600; }
 
         /* Table */
-        .vf-table { color: #e2e8f0; }
-        .vf-table th { color: #64748b; font-size: .75rem; text-transform: uppercase; letter-spacing: .8px; border-color: var(--vf-border); }
-        .vf-table td { border-color: var(--vf-border); vertical-align: middle; }
+        .vf-table { color: #e2e8f0; --bs-table-bg: transparent; --bs-table-color: #e2e8f0; }
+        .vf-table th { color: #64748b; font-size: .75rem; text-transform: uppercase; letter-spacing: .8px; border-color: var(--vf-border); background: transparent; }
+        .vf-table td { border-color: var(--vf-border); vertical-align: middle; background: transparent; }
+        .vf-table tbody tr { background: transparent !important; }
+        .vf-table tbody tr:hover { background: rgba(255,255,255,.03) !important; }
 
         /* Divider */
         .vf-divider { border-color: var(--vf-border); }

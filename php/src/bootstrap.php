@@ -31,6 +31,7 @@ $builder->addDefinitions(APP_ROOT . "/config/definitions.php");
 $builder->useAttributes(true);
 $container = $builder->build();
 
+
 // Donne le conteneur au router pour construire les controllers automatiquement
 $strategy = new ApplicationStrategy;
 $strategy->setContainer($container);
