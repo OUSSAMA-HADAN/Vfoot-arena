@@ -1,7 +1,7 @@
 #include "AuthService.h"
 #include "DatabaseManager.h"
+#include <QCryptographicHash>
 #include <QSqlQuery>
-#include <QSqlRecord>
 #include <QSqlError>
 
 AuthService::AuthService(QObject* parent) : QObject(parent) {}
@@ -36,10 +36,14 @@ bool AuthService::authenticate(const QString& email,
         "LIMIT 1"
     ).arg(roleCol);
 
+    const QString hashedPassword = QString::fromLatin1(
+        QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256).toHex()
+    );
+
     QSqlQuery q(db.database());
     q.prepare(sql);
     q.addBindValue(email.trimmed());
-    q.addBindValue(password);
+    q.addBindValue(hashedPassword);
     if (!q.exec()) {
         m_lastError = q.lastError().text();
         return false;
