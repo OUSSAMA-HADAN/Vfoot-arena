@@ -3,7 +3,6 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QSqlError>
-#include <QDebug>
 
 AuthService::AuthService(QObject* parent) : QObject(parent) {}
 
@@ -29,19 +28,22 @@ bool AuthService::authenticate(const QString& email,
     }
 
     const QString roleCol = db.detectRoleColumn();
-
-    QString e = email.trimmed();    e.replace("'", "''");
-    QString p = password;           p.replace("'", "''");
-
     const QString sql = QString(
         "SELECT u.id_user, u.username, u.email, r.%1 AS role, u.is_banned "
         "FROM users u "
         "INNER JOIN role r ON u.id_role = r.id_role "
-        "WHERE u.email = '%2' AND u.password = '%3' "
+        "WHERE u.email = ? AND u.password = ? "
         "LIMIT 1"
-    ).arg(roleCol, e, p);
+    ).arg(roleCol);
 
-    QSqlQuery q = db.exec(sql);
+    QSqlQuery q(db.database());
+    q.prepare(sql);
+    q.addBindValue(email.trimmed());
+    q.addBindValue(password);
+    if (!q.exec()) {
+        m_lastError = q.lastError().text();
+        return false;
+    }
 
     if (!q.next()) {
         m_lastError = QStringLiteral("Email ou mot de passe incorrect.");

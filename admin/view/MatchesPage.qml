@@ -32,7 +32,6 @@ Rectangle {
                 }
             }
         }
-
         DataTable {
             Layout.fillWidth: true
             Layout.fillHeight: true

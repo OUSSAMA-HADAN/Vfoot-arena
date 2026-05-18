@@ -22,9 +22,10 @@ int SqlQueryModel::colCount() const {
 
 QStringList SqlQueryModel::headers() const {
     QStringList h;
-    const QSqlRecord rec = record();
-    for (int i = 0; i < rec.count(); ++i)
-        h << rec.fieldName(i);
+
+    for (int i = 0; i < record().count(); ++i)
+        h << record().fieldName(i);
+
     return h;
 }
 
@@ -40,5 +41,9 @@ void SqlQueryModel::refresh(const QString& sql, const QSqlDatabase& db) {
     QSqlQuery q(db);
     if (!q.exec(sql))
         qWarning() << "[SqlQueryModel] refresh error:" << q.lastError().text();
+    setQuery(std::move(q));
+}
+
+void SqlQueryModel::refresh(QSqlQuery&& q) {
     setQuery(std::move(q));
 }

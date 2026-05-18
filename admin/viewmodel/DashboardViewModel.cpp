@@ -20,18 +20,18 @@ void DashboardViewModel::loadCups() {
 }
 
 void DashboardViewModel::loadStats() {
-    auto& db = DatabaseManager::instance();
+    QSqlQuery q(DatabaseManager::instance().database());
 
-    auto q = db.exec(QStringLiteral("SELECT COUNT(*) FROM users"));
+    q.exec(QStringLiteral("SELECT COUNT(*) FROM users"));
     if (q.next()) m_totalUsers = q.value(0).toInt();
 
-    q = db.exec(QStringLiteral("SELECT COUNT(*) FROM cup"));
+    q.exec(QStringLiteral("SELECT COUNT(*) FROM cup"));
     if (q.next()) m_totalCups = q.value(0).toInt();
 
-    q = db.exec(QStringLiteral("SELECT COUNT(*) FROM matche"));
+    q.exec(QStringLiteral("SELECT COUNT(*) FROM matche"));
     if (q.next()) m_totalMatches = q.value(0).toInt();
 
-    q = db.exec(QStringLiteral("SELECT COUNT(*) FROM trophee"));
+    q.exec(QStringLiteral("SELECT COUNT(*) FROM trophee"));
     if (q.next()) m_totalTrophies = q.value(0).toInt();
 
     emit statsLoaded();

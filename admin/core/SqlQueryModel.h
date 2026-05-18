@@ -20,6 +20,7 @@ public:
     Q_INVOKABLE QVariantList rowData(int row)    const;
 
     void refresh(const QString& sql, const QSqlDatabase& db);
+    void refresh(QSqlQuery&& q);
 
 signals:
     void headersChanged();
