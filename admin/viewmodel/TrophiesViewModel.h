@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseViewModel.h"
 #include "SqlQueryModel.h"
+#include "TrophyRepository.h"
 
 class TrophiesViewModel : public BaseViewModel {
     Q_OBJECT
@@ -15,5 +16,6 @@ public:
     Q_INVOKABLE void loadTrophies();
 
 private:
-    SqlQueryModel* m_trophiesModel;
+    TrophyRepository m_repo;
+    SqlQueryModel*   m_trophiesModel;
 };

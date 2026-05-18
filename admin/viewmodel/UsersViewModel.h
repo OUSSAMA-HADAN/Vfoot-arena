@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseViewModel.h"
 #include "SqlQueryModel.h"
+#include "UserRepository.h"
 #include <QString>
 
 class UsersViewModel : public BaseViewModel {
@@ -32,6 +33,7 @@ signals:
     void statusChanged();
 
 private:
+    UserRepository m_repo;
     SqlQueryModel* m_usersModel;
     QString        m_statusMsg;
     bool           m_statusError = false;

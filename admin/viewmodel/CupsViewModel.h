@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseViewModel.h"
 #include "SqlQueryModel.h"
+#include "CupRepository.h"
 #include <QString>
 
 class CupsViewModel : public BaseViewModel {
@@ -18,5 +19,6 @@ public:
     Q_INVOKABLE QString cupNameAtRow(int row) const;
 
 private:
+    CupRepository  m_repo;
     SqlQueryModel* m_cupsModel;
 };

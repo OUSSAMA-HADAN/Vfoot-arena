@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseViewModel.h"
 #include "SqlQueryModel.h"
+#include "MatchRepository.h"
 
 class MatchesViewModel : public BaseViewModel {
     Q_OBJECT
@@ -15,5 +16,6 @@ public:
     Q_INVOKABLE void loadMatches();
 
 private:
-    SqlQueryModel* m_matchesModel;
+    MatchRepository m_repo;
+    SqlQueryModel*  m_matchesModel;
 };

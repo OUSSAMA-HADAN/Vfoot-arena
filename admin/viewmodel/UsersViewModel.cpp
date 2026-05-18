@@ -1,9 +1,6 @@
 #include "UsersViewModel.h"
-#include "DatabaseManager.h"
-#include <QSqlQuery>
-#include <QSqlError>
+#include "UserRepository.h"
 #include <QRegularExpression>
-#include <QDebug>
 
 UsersViewModel::UsersViewModel(QObject* parent)
     : BaseViewModel(parent)
@@ -21,16 +18,7 @@ void UsersViewModel::setStatus(const QString& msg, bool error) {
 }
 
 void UsersViewModel::loadUsers() {
-    auto& db = DatabaseManager::instance();
-    const QString roleCol = db.detectRoleColumn();
-    const QString sql = QString(
-        "SELECT u.id_user, u.username, u.email, r.%1 AS `Rôle`, "
-        "CASE WHEN u.is_banned = 1 THEN 'Oui' ELSE 'Non' END AS `Banni` "
-        "FROM users u "
-        "INNER JOIN role r ON u.id_role = r.id_role "
-        "ORDER BY u.created_at DESC"
-    ).arg(roleCol);
-    m_usersModel->refresh(sql, db.database());
+    m_repo.loadAll(m_usersModel);
 }
 
 int UsersViewModel::userIdAtRow(int row) const {
@@ -49,11 +37,7 @@ QString UsersViewModel::userEmailAtRow(int row) const {
 }
 
 bool UsersViewModel::userIsBannedById(int id) const {
-    QSqlQuery q(DatabaseManager::instance().database());
-    q.prepare(QStringLiteral("SELECT is_banned FROM users WHERE id_user = ?"));
-    q.addBindValue(id);
-    if (!q.exec()) qWarning() << q.lastError().text();
-    return q.next() && q.value(0).toBool();
+    return m_repo.isBanned(id);
 }
 
 void UsersViewModel::changeName(int userId, const QString& name) {
@@ -61,12 +45,10 @@ void UsersViewModel::changeName(int userId, const QString& name) {
         setStatus(QStringLiteral("Le nom ne peut pas être vide."), true);
         return;
     }
-    QSqlQuery q(DatabaseManager::instance().database());
-    q.prepare(QStringLiteral("UPDATE users SET username = ? WHERE id_user = ?"));
-    q.addBindValue(name.trimmed());
-    q.addBindValue(userId);
-    if (!q.exec()) qWarning() << q.lastError().text();
-    setStatus(QStringLiteral("Nom modifié avec succès."), false);
+    if (m_repo.changeName(userId, name.trimmed()))
+        setStatus(QStringLiteral("Nom modifié avec succès."), false);
+    else
+        setStatus(m_repo.lastError(), true);
     loadUsers();
 }
 
@@ -76,32 +58,27 @@ void UsersViewModel::changeEmail(int userId, const QString& email) {
         setStatus(QStringLiteral("Adresse email invalide."), true);
         return;
     }
-    QSqlQuery q(DatabaseManager::instance().database());
-    q.prepare(QStringLiteral("UPDATE users SET email = ? WHERE id_user = ?"));
-    q.addBindValue(email.trimmed());
-    q.addBindValue(userId);
-    if (!q.exec()) qWarning() << q.lastError().text();
-    setStatus(QStringLiteral("Email modifié avec succès."), false);
+    if (m_repo.changeEmail(userId, email.trimmed()))
+        setStatus(QStringLiteral("Email modifié avec succès."), false);
+    else
+        setStatus(m_repo.lastError(), true);
     loadUsers();
 }
 
 void UsersViewModel::toggleBan(int userId, bool ban) {
-    QSqlQuery q(DatabaseManager::instance().database());
-    q.prepare(QStringLiteral("UPDATE users SET is_banned = ? WHERE id_user = ?"));
-    q.addBindValue(ban);
-    q.addBindValue(userId);
-    if (!q.exec()) qWarning() << q.lastError().text();
-    setStatus(ban ? QStringLiteral("Utilisateur banni.")
-                  : QStringLiteral("Utilisateur débanni."), false);
+    if (m_repo.toggleBan(userId, ban))
+        setStatus(ban ? QStringLiteral("Utilisateur banni.")
+                      : QStringLiteral("Utilisateur débanni."), false);
+    else
+        setStatus(m_repo.lastError(), true);
     loadUsers();
 }
 
 void UsersViewModel::deleteUser(int userId) {
-    QSqlQuery q(DatabaseManager::instance().database());
-    q.prepare(QStringLiteral("DELETE FROM users WHERE id_user = ?"));
-    q.addBindValue(userId);
-    if (!q.exec()) qWarning() << q.lastError().text();
-    setStatus(QStringLiteral("Utilisateur supprimé."), false);
+    if (m_repo.deleteUser(userId))
+        setStatus(QStringLiteral("Utilisateur supprimé."), false);
+    else
+        setStatus(m_repo.lastError(), true);
     loadUsers();
 }
 
