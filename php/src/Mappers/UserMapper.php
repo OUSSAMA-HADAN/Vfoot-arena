@@ -16,9 +16,11 @@ class UserMapper
         $user = new User();
 
         $user->setId((int) $row['id']);
+        $user->setUsername((string) ($row['username'] ?? ''));
         $user->setEmail((string) $row['email']);
         $user->setPassword((string) $row['password']);
         $user->setRole((string) ($row['role'] ?? 'player'));
+        $user->setCreatedAt((string) ($row['created_at'] ?? ''));
 
         return $user;
     }

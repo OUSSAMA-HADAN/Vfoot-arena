@@ -235,6 +235,27 @@
                     <span class="vf-badge badge-confirmed" style="font-size:.85rem;padding:7px 16px">
                         <i class="bi bi-check-lg me-1"></i>Inscrit
                     </span>
+                <?php elseif ($cup->getVisibilite() === 'private'): ?>
+                    <?php $flashError = $_SESSION['flash_error'] ?? null; unset($_SESSION['flash_error']); ?>
+                    <form action="/cups/<?= $cup->getId() ?>/join" method="POST" class="d-flex gap-2 align-items-center">
+                        <input
+                            type="text"
+                            name="join_code"
+                            class="form-control vf-input"
+                            style="width:160px;letter-spacing:.1em;text-transform:uppercase;font-weight:700"
+                            placeholder="Code d'invitation"
+                            autocomplete="off"
+                            required
+                        >
+                        <button type="submit" class="btn btn-vf">
+                            <i class="bi bi-lock-fill me-1"></i>Rejoindre
+                        </button>
+                    </form>
+                    <?php if ($flashError): ?>
+                        <small class="text-danger d-block mt-1" style="font-size:.8rem">
+                            <i class="bi bi-exclamation-triangle me-1"></i><?= $this->e($flashError) ?>
+                        </small>
+                    <?php endif ?>
                 <?php else: ?>
                     <form action="/cups/<?= $cup->getId() ?>/join" method="POST">
                         <button type="submit" class="btn btn-vf">
@@ -357,6 +378,45 @@
         <?php endif ?>
 
         <?php endforeach ?>
+
+        <?php
+            // Colonne Champion — uniquement si la Finale est confirmée
+            $finalMatches = $knockoutRounds['F'] ?? [];
+            $finalMatch   = count($finalMatches) > 0 ? $finalMatches[0] : null;
+            $winner       = null;
+            if ($finalMatch && $finalMatch->getResultHome() !== null) {
+                $winner = $finalMatch->getResultHome() > $finalMatch->getResultAway()
+                    ? $finalMatch->getHomeName()
+                    : $finalMatch->getAwayName();
+            }
+        ?>
+        <?php if ($winner): ?>
+        <!-- Connector -->
+        <div class="d-flex align-items-center" style="width:32px;align-self:stretch">
+            <div style="width:100%;border-top:1px solid rgba(245,158,11,.4)"></div>
+        </div>
+        <!-- Winner column -->
+        <div class="bracket-round" style="min-width:160px">
+            <div class="bracket-round-title" style="background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2)">
+                Champion
+            </div>
+            <div class="bracket-matches">
+                <div style="background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(245,158,11,.06));
+                            border:1px solid rgba(245,158,11,.35);border-radius:12px;
+                            padding:1.25rem 1rem;text-align:center">
+                    <div style="font-size:2rem;line-height:1;margin-bottom:.5rem">🏆</div>
+                    <div style="font-weight:800;font-size:1rem;color:#f59e0b;letter-spacing:.3px">
+                        <?= $this->e($winner) ?>
+                    </div>
+                    <div style="font-size:.65rem;font-weight:700;letter-spacing:1.5px;color:#92400e;
+                                text-transform:uppercase;margin-top:.4rem">
+                        Champion
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif ?>
+
     </div>
 </div>
 <?php endif ?>
@@ -435,7 +495,7 @@
         </div>
     <?php else:
         $organizers = array_filter($participants, fn($p) => $p['role'] === 'organizer');
-        $players    = array_filter($participants, fn($p) => $p['role'] === 'player');
+        $players    = $participants; // tous les participants, organisateur inclus
     ?>
 
         <!-- Organisateur -->
@@ -476,10 +536,18 @@
                         <td class="ps-4 text-secondary"><?= $i++ ?></td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="participant-avatar" style="width:28px;height:28px;font-size:.7rem">
+                                <div class="participant-avatar" style="width:28px;height:28px;font-size:.7rem;
+                                    <?= $p['role'] === 'organizer' ? 'background:linear-gradient(135deg,#3b82f6,#1d4ed8)' : '' ?>">
                                     <?= strtoupper(substr($p['username'], 0, 1)) ?>
                                 </div>
                                 <span class="fw-semibold text-white"><?= $this->e($p['username']) ?></span>
+                                <?php if ($p['role'] === 'organizer'): ?>
+                                    <span style="font-size:.65rem;font-weight:700;letter-spacing:.5px;padding:2px 8px;
+                                                 border-radius:20px;background:rgba(59,130,246,.12);
+                                                 color:#60a5fa;border:1px solid rgba(59,130,246,.25)">
+                                        ORG
+                                    </span>
+                                <?php endif ?>
                             </div>
                         </td>
                         <td class="text-secondary" style="font-size:.83rem">

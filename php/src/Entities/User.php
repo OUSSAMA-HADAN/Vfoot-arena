@@ -9,9 +9,11 @@ namespace App\Entities;
 class User
 {
     private int $id;
+    private string $username = '';
     private string $email;
     private string $password;
     private string $role = 'player';
+    private string $createdAt = '';
 
     public function getId(): int
     {
@@ -21,6 +23,16 @@ class User
     public function setId(int $id): void
     {
         $this->id = $id;
+    }
+
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(string $username): void
+    {
+        $this->username = $username;
     }
 
     public function getEmail(): string
@@ -51,5 +63,15 @@ class User
     public function setRole(string $role): void
     {
         $this->role = $role;
+    }
+
+    public function getCreatedAt(): string
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(string $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 }

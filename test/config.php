@@ -3,10 +3,11 @@
 // Connexion directe PDO — utilisée uniquement pour les tests
 // Aucun lien avec l'architecture MVC du player
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'efootball_tournament');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// Identifiants lus depuis l'environnement (valeurs par défaut = XAMPP local)
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME', getenv('DB_NAME') ?: 'efootball_tournament');
+define('DB_USER', getenv('DB_USERNAME') ?: 'root');
+define('DB_PASS', getenv('DB_PASSWORD') ?: '');
 
 function db(): PDO {
     static $pdo = null;

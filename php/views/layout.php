@@ -132,7 +132,9 @@
                             <a class="nav-link" href="/matches"><i class="bi bi-lightning me-1"></i>Matches</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/profile"><i class="bi bi-person me-1"></i>Profile</a>
+                            <a class="nav-link" href="/profile">
+                                <i class="bi bi-person-circle me-1"></i><?= htmlspecialchars($_SESSION['user_username'] ?? 'Profil') ?>
+                            </a>
                         </li>
                         <li class="nav-item ms-2">
                             <a class="nav-link text-danger" href="/logout"><i class="bi bi-box-arrow-right me-1"></i>Logout</a>

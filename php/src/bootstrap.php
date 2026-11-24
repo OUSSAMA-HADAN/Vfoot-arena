@@ -25,17 +25,26 @@ session_start();
 $request = ServerRequest::fromGlobals();
 $router = new Router;
 
+
+// $container = (new DI\ContainerBuilder())
+//     ->addDefinitions(APP_ROOT . "/config/definitions.php")
+//     ->useAttributes(true)
+//     ->build();
+
+
 // Construit le conteneur d'injection de dépendances
-$builder = new DI\ContainerBuilder;
-$builder->addDefinitions(APP_ROOT . "/config/definitions.php");
-$builder->useAttributes(true);
-$container = $builder->build();
+$builder = new DI\ContainerBuilder; // Builder de configuration du container
+$builder->addDefinitions(APP_ROOT . "/config/definitions.php"); // Charge les mappings Interface → Classe
+$builder->useAttributes(true); // Active les attributs PHP 8 comme #[Inject]
+$container = $builder->build(); // Crée le container final capable de résoudre les dépendances automatiquement
 
 
 // Donne le conteneur au router pour construire les controllers automatiquement
 $strategy = new ApplicationStrategy;
 $strategy->setContainer($container);
 $router->setStrategy($strategy);
+
+
 
 // Charge la liste des routes
 $routes = require APP_ROOT . "/config/routes.php";
@@ -47,3 +56,7 @@ $response = $router->dispatch($request);
 // Envoie la réponse HTTP au navigateur
 $emitter = new SapiEmitter;
 $emitter->emit($response);
+
+
+
+

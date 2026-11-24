@@ -39,4 +39,7 @@ interface CupRepositoryInterface extends RepositoryInterface
 
     // Retourne la liste des participants d'une cup.
     public function getParticipants(int $idCup): array;
+
+    // Trouve une cup privée par son code d'invitation — null si introuvable.
+    public function findByJoinCode(string $code): ?Cup;
 }

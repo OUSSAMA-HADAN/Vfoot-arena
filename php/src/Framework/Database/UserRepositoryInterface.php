@@ -17,4 +17,7 @@ interface UserRepositoryInterface extends RepositoryInterface
 
     // Crée un nouvel utilisateur avec email, username et mot de passe hashé bcrypt.
     public function create(string $email, string $username, string $hashedPassword): void;
+
+    // Retourne les trophées remportés par un joueur : [nom, icone, date_obtention][].
+    public function getTrophees(int $userId): array;
 }

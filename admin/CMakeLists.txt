@@ -1,5 +1,23 @@
 cmake_minimum_required(VERSION 3.21)
-project(EFootApp VERSION 1.0 LANGUAGES CXX)
+project(EFootApp VERSION 1.0 LANGUAGES CXX C)
+
+# ── BCrypt (libbcrypt — Solar Designer / rg3) ───────────────────────────────
+include(FetchContent)
+FetchContent_Declare(libbcrypt_src
+    GIT_REPOSITORY https://github.com/rg3/libbcrypt.git
+    GIT_TAG        master
+)
+FetchContent_GetProperties(libbcrypt_src)
+if(NOT libbcrypt_src_POPULATED)
+    FetchContent_Populate(libbcrypt_src)
+    add_library(libbcrypt STATIC
+        ${libbcrypt_src_SOURCE_DIR}/bcrypt.c
+        ${libbcrypt_src_SOURCE_DIR}/crypt_blowfish.c
+        ${libbcrypt_src_SOURCE_DIR}/crypt_gensalt.c
+    )
+    target_include_directories(libbcrypt PUBLIC ${libbcrypt_src_SOURCE_DIR})
+    set_target_properties(libbcrypt PROPERTIES C_STANDARD 99)
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -64,4 +82,5 @@ target_link_libraries(EFootApp PRIVATE
     Qt6::Qml
     Qt6::QuickControls2
     Qt6::Sql
+    libbcrypt
 )

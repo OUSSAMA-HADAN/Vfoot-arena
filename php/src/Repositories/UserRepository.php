@@ -24,7 +24,7 @@ class UserRepository implements UserRepositoryInterface
     {
         $pdo  = $this->database->getConnection();
         $stmt = $pdo->prepare('
-            SELECT u.id_user AS id, u.email, u.password, r.nom AS role
+            SELECT u.id_user AS id, u.username, u.email, u.password, u.created_at, r.nom AS role
             FROM   users u
             JOIN   role  r ON u.id_role = r.id_role
             WHERE  u.email = ?
@@ -40,7 +40,7 @@ class UserRepository implements UserRepositoryInterface
     {
         $pdo  = $this->database->getConnection();
         $stmt = $pdo->prepare('
-            SELECT u.id_user AS id, u.email, u.password, r.nom AS role
+            SELECT u.id_user AS id, u.username, u.email, u.password, u.created_at, r.nom AS role
             FROM   users u
             JOIN   role  r ON u.id_role = r.id_role
             WHERE  u.id_user = ?
@@ -57,5 +57,20 @@ class UserRepository implements UserRepositoryInterface
         $pdo  = $this->database->getConnection();
         $stmt = $pdo->prepare('INSERT INTO users (email, username, password) VALUES (?, ?, ?)');
         $stmt->execute([$email, $username, $hashedPassword]);
+    }
+
+    public function getTrophees(int $userId): array
+    {
+        $pdo  = $this->database->getConnection();
+        $stmt = $pdo->prepare('
+            SELECT t.nom, t.icone, r.date_obtention
+            FROM   remporte r
+            JOIN   trophee  t ON r.id_trophee = t.id_trophee
+            WHERE  r.id_user = ?
+            ORDER  BY r.date_obtention DESC
+        ');
+        $stmt->execute([$userId]);
+
+        return $stmt->fetchAll();
     }
 }

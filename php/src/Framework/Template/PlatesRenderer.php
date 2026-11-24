@@ -9,7 +9,6 @@ class PlatesRenderer implements RendererInterface{
     {
         $engine= new Engine(dirname(__DIR__,3)."/views");
 
-        $engine->render($template,$data);
         return $engine->render($template,$data);
     }
 }

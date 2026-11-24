@@ -36,6 +36,8 @@ return function (Router $router, ContainerInterface $container) {
 
         // Cups
         $router->get('/cups',                      [CupController::class, 'index']);
+        $router->get('/cups/join-code',            [CupController::class, 'showJoinByCode']);
+        $router->post('/cups/join-code',           [CupController::class, 'joinByCode']);
         $router->get('/cups/{id:number}',          [CupController::class, 'show']);
         $router->post('/cups/{id:number}/join',    [CupController::class, 'join']);
 
@@ -45,7 +47,8 @@ return function (Router $router, ContainerInterface $container) {
         $router->post('/matches/{id:number}/score',    [MatcheController::class, 'submitScore']);
 
         // Profil
-        $router->get('/profile', [ProfileController::class, 'show']);
+        $router->get('/profile',          [ProfileController::class, 'show']);
+        $router->get('/profile/trophees', [ProfileController::class, 'trophees']);
 
     })->middleware($authMiddleware);
 };

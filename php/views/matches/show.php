@@ -26,6 +26,10 @@
     <div class="alert border-0 mb-4" style="background:rgba(239,68,68,.12);color:#f87171;border-radius:10px">
         <i class="bi bi-exclamation-triangle me-2"></i>Litige — les scores ne correspondent pas. Un admin va trancher.
     </div>
+<?php elseif ($status === 'already_submitted'): ?>
+    <div class="alert border-0 mb-4" style="background:rgba(239,68,68,.12);color:#f87171;border-radius:10px">
+        <i class="bi bi-lock me-2"></i>Vous avez déjà soumis votre score — aucune modification possible.
+    </div>
 <?php endif ?>
 
 <!-- Match card -->

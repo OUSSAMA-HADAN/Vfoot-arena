@@ -25,7 +25,7 @@ class CupRepository implements CupRepositoryInterface
         $pdo  = $this->database->getConnection();
         $stmt = $pdo->query("
             SELECT c.id_cup, c.titre, c.statut, c.visibilite,
-                   c.min_players, c.max_players, c.qualification,
+                   c.min_players, c.max_players, c.qualification, c.join_code,
                    u.username AS organisateur
             FROM   cup   c
             JOIN   users u ON c.created_by = u.id_user
@@ -40,7 +40,7 @@ class CupRepository implements CupRepositoryInterface
         $pdo  = $this->database->getConnection();
         $stmt = $pdo->prepare("
             SELECT c.id_cup, c.titre, c.statut, c.visibilite,
-                   c.min_players, c.max_players, c.qualification,
+                   c.min_players, c.max_players, c.qualification, c.join_code,
                    u.username AS organisateur
             FROM   cup   c
             JOIN   users u ON c.created_by = u.id_user
@@ -57,12 +57,12 @@ class CupRepository implements CupRepositoryInterface
         $pdo  = $this->database->getConnection();
         $stmt = $pdo->query("
             SELECT c.id_cup, c.titre, c.statut, c.visibilite,
-                   c.min_players, c.max_players, c.qualification,
+                   c.min_players, c.max_players, c.qualification, c.join_code,
                    u.username AS organisateur
             FROM   cup   c
             JOIN   users u ON c.created_by = u.id_user
             WHERE  c.visibilite = 'public'
-              AND  c.statut     IN ('open', 'started')
+              AND  c.statut     IN ('open', 'started', 'finished')
             ORDER  BY c.created_at DESC
         ");
 
@@ -112,6 +112,24 @@ class CupRepository implements CupRepositoryInterface
             INSERT IGNORE INTO participe (id_cup, id_user, role) VALUES (?, ?, 'player')
         ");
         $stmt->execute([$idCup, $idUser]);
+    }
+
+    public function findByJoinCode(string $code): ?Cup
+    {
+        $pdo  = $this->database->getConnection();
+        $stmt = $pdo->prepare("
+            SELECT c.id_cup, c.titre, c.statut, c.visibilite,
+                   c.min_players, c.max_players, c.qualification, c.join_code,
+                   u.username AS organisateur
+            FROM   cup   c
+            JOIN   users u ON c.created_by = u.id_user
+            WHERE  c.join_code = ?
+            LIMIT  1
+        ");
+        $stmt->execute([$code]);
+        $row = $stmt->fetch();
+
+        return $row !== false ? $this->mapper->mapToObject($row) : null;
     }
 
     public function getParticipants(int $idCup): array

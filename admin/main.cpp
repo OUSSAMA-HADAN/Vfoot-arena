@@ -3,76 +3,68 @@
 #include <QQmlContext>
 #include <QtQuickControls2/QQuickStyle>
 
-#include "DatabaseManager.h"
-#include "SqlQueryModel.h"
 #include "AuthService.h"
 #include "LoginViewModel.h"
 #include "AppViewModel.h"
 #include "DashboardViewModel.h"
 #include "UsersViewModel.h"
 #include "CupsViewModel.h"
-#include "GroupesViewModel.h"
 #include "MatchesViewModel.h"
 #include "TrophiesViewModel.h"
+#include "GroupesViewModel.h"
 
 int main(int argc, char* argv[]) {
-
-
     QQuickStyle::setStyle(QStringLiteral("Basic"));
 
     QApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("eFoot Admin"));
     app.setApplicationVersion(QStringLiteral("1.0"));
 
+    // Identifiants lus depuis les variables d'environnement (jamais en dur dans le code).
+    // Valeurs par défaut = XAMPP local.
+    auto env = [](const char* name, const char* fallback) {
+        const QString v = qEnvironmentVariable(name);
+        return v.isEmpty() ? QString::fromUtf8(fallback) : v;
+    };
 
     AuthService authService;
     authService.connectDatabase(
-        QStringLiteral("127.0.0.1"), 3306,
-        QStringLiteral("efootball_tournament"),
-        QStringLiteral("root"), QStringLiteral("")
+        env("DB_HOST", "127.0.0.1"),
+        env("DB_PORT", "3306").toInt(),
+        env("DB_NAME", "efootball_tournament"),
+        env("DB_USERNAME", "root"),
+        env("DB_PASSWORD", "")
     );
-
 
     AppViewModel       appVM;
     LoginViewModel     loginVM(&authService);
     DashboardViewModel dashVM;
     UsersViewModel     usersVM;
     CupsViewModel      cupsVM;
-    GroupesViewModel   groupesVM;
     MatchesViewModel   matchesVM;
     TrophiesViewModel  trophiesVM;
-
+    GroupesViewModel   groupesVM;
 
     QObject::connect(&loginVM, &LoginViewModel::loginSuccess,
                      &appVM,   &AppViewModel::onLoginSuccess);
-
 
     QObject::connect(&appVM, &AppViewModel::authChanged, &appVM, [&]() {
         if (appVM.loggedIn()) {
             dashVM.loadStats();
             dashVM.loadCups();
-            usersVM.loadUsers();
-            cupsVM.loadCups();
-            matchesVM.loadMatches();
-            trophiesVM.loadTrophies();
         }
     });
 
-
-    qmlRegisterType<SqlQueryModel>("EFoot", 1, 0, "SqlQueryModel");
-
-
     QQmlApplicationEngine engine;
-    auto* ctx = engine.rootContext();
 
-    ctx->setContextProperty(QStringLiteral("appVM"),      &appVM);
-    ctx->setContextProperty(QStringLiteral("loginVM"),    &loginVM);
-    ctx->setContextProperty(QStringLiteral("dashVM"),     &dashVM);
-    ctx->setContextProperty(QStringLiteral("usersVM"),    &usersVM);
-    ctx->setContextProperty(QStringLiteral("cupsVM"),     &cupsVM);
-    ctx->setContextProperty(QStringLiteral("groupesVM"),  &groupesVM);
-    ctx->setContextProperty(QStringLiteral("matchesVM"),  &matchesVM);
-    ctx->setContextProperty(QStringLiteral("trophiesVM"), &trophiesVM);
+    engine.rootContext()->setContextProperty(QStringLiteral("appVM"),      &appVM);
+    engine.rootContext()->setContextProperty(QStringLiteral("loginVM"),    &loginVM);
+    engine.rootContext()->setContextProperty(QStringLiteral("dashVM"),     &dashVM);
+    engine.rootContext()->setContextProperty(QStringLiteral("usersVM"),    &usersVM);
+    engine.rootContext()->setContextProperty(QStringLiteral("cupsVM"),     &cupsVM);
+    engine.rootContext()->setContextProperty(QStringLiteral("matchesVM"),  &matchesVM);
+    engine.rootContext()->setContextProperty(QStringLiteral("trophiesVM"), &trophiesVM);
+    engine.rootContext()->setContextProperty(QStringLiteral("groupesVM"),  &groupesVM);
 
     const QUrl mainUrl(QStringLiteral("qrc:/EFoot/view/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

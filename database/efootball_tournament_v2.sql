@@ -232,25 +232,30 @@ CREATE TABLE participe (
 
 -- ============================================================
 -- TABLE : est_classe_dans
--- Description : classement d'un joueur dans un groupe
+-- Description : classement d'un joueur dans une cup, par phase
+--               phase='group'   → id_groupe renseigné, points actifs
+--               phase='knockout' → id_groupe NULL, pas de points
 --               mis à jour après chaque match confirmé
 -- ============================================================
 CREATE TABLE est_classe_dans (
 
   -- Colonnes
-  id_user       INT NOT NULL,                                             -- joueur
-  id_groupe     INT NOT NULL,                                             -- groupe concerné
-  played        INT NOT NULL DEFAULT 0,                                   -- matchs joués
-  wins          INT NOT NULL DEFAULT 0,                                   -- victoires
-  draws         INT NOT NULL DEFAULT 0,                                   -- matchs nuls
-  losses        INT NOT NULL DEFAULT 0,                                   -- défaites
-  goals_for     INT NOT NULL DEFAULT 0,                                   -- buts marqués
-  goals_against INT NOT NULL DEFAULT 0,                                   -- buts encaissés
-  points        INT NOT NULL DEFAULT 0,                                   -- points totaux
+  id_user       INT                        NOT NULL,                      -- joueur
+  id_cup        INT                        NOT NULL,                      -- cup concernée (référence directe)
+  phase         ENUM('group','knockout')   NOT NULL,                      -- phase de jeu
+  id_groupe     INT                        NULL,                          -- groupe (NULL si knockout)
+  played        INT                        NOT NULL DEFAULT 0,            -- matchs joués
+  wins          INT                        NOT NULL DEFAULT 0,            -- victoires
+  draws         INT                        NOT NULL DEFAULT 0,            -- matchs nuls
+  losses        INT                        NOT NULL DEFAULT 0,            -- défaites
+  goals_for     INT                        NOT NULL DEFAULT 0,            -- buts marqués
+  goals_against INT                        NOT NULL DEFAULT 0,            -- buts encaissés
+  points        INT                        NOT NULL DEFAULT 0,            -- points (0 en knockout)
 
   -- Contraintes
-  CONSTRAINT pk_est_classe_dans          PRIMARY KEY (id_user, id_groupe), -- clé primaire composite
+  CONSTRAINT pk_est_classe_dans          PRIMARY KEY (id_user, id_cup, phase),
   CONSTRAINT fk_est_classe_id_user       FOREIGN KEY (id_user)   REFERENCES users(id_user),
+  CONSTRAINT fk_est_classe_id_cup        FOREIGN KEY (id_cup)    REFERENCES cup(id_cup),
   CONSTRAINT fk_est_classe_id_groupe     FOREIGN KEY (id_groupe) REFERENCES groupe(id_groupe),
   CONSTRAINT ck_est_classe_played        CHECK (played >= 0),
   CONSTRAINT ck_est_classe_wins          CHECK (wins >= 0),
@@ -259,43 +264,14 @@ CREATE TABLE est_classe_dans (
   CONSTRAINT ck_est_classe_goals_for     CHECK (goals_for >= 0),
   CONSTRAINT ck_est_classe_goals_against CHECK (goals_against >= 0),
   CONSTRAINT ck_est_classe_points        CHECK (points >= 0),
-  CONSTRAINT ck_est_classe_coherence     CHECK (played = wins + draws + losses) -- cohérence des stats
+  CONSTRAINT ck_est_classe_coherence     CHECK (played = wins + draws + losses),
+  CONSTRAINT ck_est_classe_groupe_phase  CHECK (                                 -- cohérence groupe/phase
+    (phase = 'group'    AND id_groupe IS NOT NULL) OR
+    (phase = 'knockout' AND id_groupe IS NULL)
+  ),
+  CONSTRAINT ck_est_classe_points_phase  CHECK (phase = 'group' OR points = 0)  -- pas de points en knockout
 
 );
-
-
--- ============================================================
--- TABLE : stats_joueur
--- Description : statistiques globales d'un joueur
---               séparées par phase (groupes ou knockout)
--- ============================================================
-CREATE TABLE stats_joueur (
-
-  -- Colonnes
-  id_stats      INT  NOT NULL AUTO_INCREMENT,                             -- identifiant unique
-  id_user       INT  NOT NULL,                                            -- joueur concerné
-  phase         ENUM('group', 'knockout') NOT NULL,                       -- phase de jeu
-  wins          INT  NOT NULL DEFAULT 0,                                  -- victoires
-  draws         INT  NOT NULL DEFAULT 0,                                  -- matchs nuls
-  losses        INT  NOT NULL DEFAULT 0,                                  -- défaites
-  goals_for     INT  NOT NULL DEFAULT 0,                                  -- buts marqués
-  goals_against INT  NOT NULL DEFAULT 0,                                  -- buts encaissés
-  total_matches INT  NOT NULL DEFAULT 0,                                  -- total matchs joués
-
-  -- Contraintes
-  CONSTRAINT pk_stats_joueur               PRIMARY KEY (id_stats),
-  CONSTRAINT fk_stats_joueur_id_user       FOREIGN KEY (id_user) REFERENCES users(id_user),
-  CONSTRAINT uq_stats_joueur_user_phase    UNIQUE (id_user, phase),       -- une seule ligne par joueur par phase
-  CONSTRAINT ck_stats_joueur_wins          CHECK (wins >= 0),
-  CONSTRAINT ck_stats_joueur_draws         CHECK (draws >= 0),
-  CONSTRAINT ck_stats_joueur_losses        CHECK (losses >= 0),
-  CONSTRAINT ck_stats_joueur_goals_for     CHECK (goals_for >= 0),
-  CONSTRAINT ck_stats_joueur_goals_against CHECK (goals_against >= 0),
-  CONSTRAINT ck_stats_joueur_total         CHECK (total_matches >= 0),
-  CONSTRAINT ck_stats_joueur_coherence     CHECK (total_matches = wins + draws + losses) -- cohérence des stats
-
-);
-
 
 -- ============================================================
 -- TABLE : trophee

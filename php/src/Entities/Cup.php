@@ -14,7 +14,8 @@ class Cup
     private int    $minPlayers;
     private int    $maxPlayers;
     private int    $qualification; // nombre de qualifiés par groupe
-    private string $organisateur;  // username du créateur
+    private string  $organisateur;  // username du créateur
+    private ?string $joinCode = null;
 
     public function getId(): int { return $this->id; }
     public function setId(int $id): void { $this->id = $id; }
@@ -39,4 +40,7 @@ class Cup
 
     public function getOrganisateur(): string { return $this->organisateur; }
     public function setOrganisateur(string $organisateur): void { $this->organisateur = $organisateur; }
+
+    public function getJoinCode(): ?string { return $this->joinCode; }
+    public function setJoinCode(?string $joinCode): void { $this->joinCode = $joinCode; }
 }

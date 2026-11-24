@@ -41,8 +41,10 @@ class AuthController extends AbstractController
             ]);
         }
 
-        $_SESSION['user_id']   = $user->getId();
-        $_SESSION['user_role'] = $user->getRole();
+        $_SESSION['user_id']       = $user->getId();
+        $_SESSION['user_role']     = $user->getRole();
+        $_SESSION['user_username'] = $user->getUsername();
+        $_SESSION['user_email']    = $user->getEmail();
 
         return $this->redirect('/cups');
     }

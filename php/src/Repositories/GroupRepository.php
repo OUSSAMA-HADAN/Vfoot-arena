@@ -48,7 +48,8 @@ class GroupRepository implements GroupRepositoryInterface
                    e.goals_for, e.goals_against, e.points
             FROM   est_classe_dans e
             JOIN   users           u ON e.id_user = u.id_user
-            WHERE  e.id_groupe = ?
+            JOIN   groupe          g ON e.id_groupe = g.id_groupe
+            WHERE  e.id_groupe = ? AND e.phase = 'group'
             ORDER  BY e.points DESC,
                       (e.goals_for - e.goals_against) DESC,
                       e.goals_for DESC

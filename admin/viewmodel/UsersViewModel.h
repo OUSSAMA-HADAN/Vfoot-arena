@@ -25,6 +25,7 @@ public:
     Q_INVOKABLE void    changeName(int userId, const QString& name);
     Q_INVOKABLE void    changeEmail(int userId, const QString& email);
     Q_INVOKABLE void    toggleBan(int userId, bool ban);
+    Q_INVOKABLE void    deleteUser(int userId);
     Q_INVOKABLE void    clearStatus();
 
 signals:

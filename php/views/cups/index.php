@@ -1,8 +1,13 @@
 <?php $this->layout('layout', ['title' => 'Cups']) ?>
 
-<div class="mb-4">
-    <p class="vf-section-title mb-1">Tournois</p>
-    <h4 class="fw-bold mb-0 text-white">Cups ouvertes</h4>
+<div class="d-flex align-items-end justify-content-between mb-4">
+    <div>
+        <p class="vf-section-title mb-1">Tournois</p>
+        <h4 class="fw-bold mb-0 text-white">Toutes les cups</h4>
+    </div>
+    <a href="/cups/join-code" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-lock me-1"></i>Cup privée ?
+    </a>
 </div>
 
 <?php if (empty($cups)): ?>

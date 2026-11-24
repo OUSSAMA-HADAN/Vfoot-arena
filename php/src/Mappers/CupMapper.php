@@ -21,6 +21,7 @@ class CupMapper
         $cup->setMaxPlayers((int) $row['max_players']);
         $cup->setQualification((int) $row['qualification']);
         $cup->setOrganisateur((string) $row['organisateur']);
+        $cup->setJoinCode(isset($row['join_code']) ? (string) $row['join_code'] : null);
 
         return $cup;
     }
