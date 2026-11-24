@@ -1,5 +1,5 @@
 #include "TrophiesViewModel.h"
-#include "DatabaseManager.h"
+#include "TrophyRepository.h"
 
 TrophiesViewModel::TrophiesViewModel(QObject* parent)
     : BaseViewModel(parent)
@@ -9,7 +9,5 @@ TrophiesViewModel::TrophiesViewModel(QObject* parent)
 SqlQueryModel* TrophiesViewModel::trophiesModel() const { return m_trophiesModel; }
 
 void TrophiesViewModel::loadTrophies() {
-    m_trophiesModel->refresh(
-        QStringLiteral("SELECT * FROM trophee"),
-        DatabaseManager::instance().database());
+    m_repo.loadAll(m_trophiesModel);
 }

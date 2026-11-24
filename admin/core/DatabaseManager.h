@@ -1,7 +1,5 @@
 #pragma once
 #include <QSqlDatabase>
-#include <QSqlQuery>
-#include <QVariantList>
 
 class DatabaseManager {
 public:
@@ -11,11 +9,8 @@ public:
                          const QString& dbName,
                          const QString& user, const QString& password);
     bool         isConnected()  const;
-    QSqlQuery    exec(const QString& sql);
     QSqlDatabase database()     const;
     QString      lastError()    const;
-
-    static QString buildSql(const QString& templ, const QVariantList& params);
 
     QString detectRoleColumn();
 

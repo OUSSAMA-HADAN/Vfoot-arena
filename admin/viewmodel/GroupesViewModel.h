@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseViewModel.h"
 #include "SqlQueryModel.h"
+#include "GroupeRepository.h"
 
 class GroupesViewModel : public BaseViewModel {
     Q_OBJECT
@@ -19,6 +20,7 @@ public:
     Q_INVOKABLE int  groupIdAtRow(int row) const;
 
 private:
-    SqlQueryModel* m_groupesModel;
-    SqlQueryModel* m_standingsModel;
+    GroupeRepository m_repo;
+    SqlQueryModel*   m_groupesModel;
+    SqlQueryModel*   m_standingsModel;
 };

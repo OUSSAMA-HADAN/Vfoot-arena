@@ -1,5 +1,5 @@
 #include "MatchesViewModel.h"
-#include "DatabaseManager.h"
+#include "MatchRepository.h"
 
 MatchesViewModel::MatchesViewModel(QObject* parent)
     : BaseViewModel(parent)
@@ -9,7 +9,5 @@ MatchesViewModel::MatchesViewModel(QObject* parent)
 SqlQueryModel* MatchesViewModel::matchesModel() const { return m_matchesModel; }
 
 void MatchesViewModel::loadMatches() {
-    m_matchesModel->refresh(
-        QStringLiteral("SELECT * FROM matche ORDER BY id_match DESC"),
-        DatabaseManager::instance().database());
+    m_repo.loadAll(m_matchesModel);
 }

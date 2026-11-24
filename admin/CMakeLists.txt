@@ -37,6 +37,13 @@ qt_add_executable(EFootApp
     model/User.h
     model/AuthService.h       model/AuthService.cpp
 
+    repository/UserRepository.h     repository/UserRepository.cpp
+    repository/CupRepository.h      repository/CupRepository.cpp
+    repository/DashboardRepository.h repository/DashboardRepository.cpp
+    repository/MatchRepository.h    repository/MatchRepository.cpp
+    repository/TrophyRepository.h   repository/TrophyRepository.cpp
+    repository/GroupeRepository.h   repository/GroupeRepository.cpp
+
     viewmodel/LoginViewModel.h      viewmodel/LoginViewModel.cpp
     viewmodel/AppViewModel.h        viewmodel/AppViewModel.cpp
     viewmodel/DashboardViewModel.h  viewmodel/DashboardViewModel.cpp
@@ -71,6 +78,7 @@ qt_add_qml_module(EFootApp
 target_include_directories(EFootApp PRIVATE
     core
     model
+    repository
     viewmodel
 )
 

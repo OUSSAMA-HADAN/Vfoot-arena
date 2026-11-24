@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseViewModel.h"
 #include "SqlQueryModel.h"
+#include "DashboardRepository.h"
 
 class DashboardViewModel : public BaseViewModel {
     Q_OBJECT
@@ -27,7 +28,8 @@ signals:
     void statsLoaded();
 
 private:
-    SqlQueryModel* m_cupsModel;
+    DashboardRepository m_repo;
+    SqlQueryModel*      m_cupsModel;
     int m_totalUsers    = 0;
     int m_totalCups     = 0;
     int m_totalMatches  = 0;

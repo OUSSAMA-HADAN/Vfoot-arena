@@ -1,6 +1,5 @@
 #include "DashboardViewModel.h"
-#include "DatabaseManager.h"
-#include <QSqlQuery>
+#include "DashboardRepository.h"
 
 DashboardViewModel::DashboardViewModel(QObject* parent)
     : BaseViewModel(parent)
@@ -14,25 +13,13 @@ int            DashboardViewModel::totalMatches()   const { return m_totalMatche
 int            DashboardViewModel::totalTrophies()  const { return m_totalTrophies; }
 
 void DashboardViewModel::loadCups() {
-    m_cupsModel->refresh(
-        QStringLiteral("SELECT * FROM cup ORDER BY created_at DESC"),
-        DatabaseManager::instance().database());
+    m_repo.loadCups(m_cupsModel);
 }
 
 void DashboardViewModel::loadStats() {
-    auto& db = DatabaseManager::instance();
-
-    auto q = db.exec(QStringLiteral("SELECT COUNT(*) FROM users"));
-    if (q.next()) m_totalUsers = q.value(0).toInt();
-
-    q = db.exec(QStringLiteral("SELECT COUNT(*) FROM cup"));
-    if (q.next()) m_totalCups = q.value(0).toInt();
-
-    q = db.exec(QStringLiteral("SELECT COUNT(*) FROM matche"));
-    if (q.next()) m_totalMatches = q.value(0).toInt();
-
-    q = db.exec(QStringLiteral("SELECT COUNT(*) FROM trophee"));
-    if (q.next()) m_totalTrophies = q.value(0).toInt();
-
+    m_totalUsers    = m_repo.countUsers();
+    m_totalCups     = m_repo.countCups();
+    m_totalMatches  = m_repo.countMatches();
+    m_totalTrophies = m_repo.countTrophies();
     emit statsLoaded();
 }

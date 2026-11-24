@@ -1,4 +1,5 @@
 #include "DatabaseManager.h"
+#include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
 
@@ -34,15 +35,6 @@ bool DatabaseManager::isConnected() const {
     return m_db.isValid() && m_db.isOpen();
 }
 
-QSqlQuery DatabaseManager::exec(const QString& sql) {
-    QSqlQuery q(m_db);
-    if (!q.exec(sql)) {
-        qWarning() << "[SQL] Error:" << q.lastError().text();
-        qWarning() << "[SQL] Query:" << sql;
-    }
-    return q;
-}
-
 QSqlDatabase DatabaseManager::database() const {
     return m_db;
 }
@@ -51,3 +43,14 @@ QString DatabaseManager::lastError() const {
     return m_lastError;
 }
 
+QString DatabaseManager::detectRoleColumn() {
+    QSqlQuery q(m_db);
+    q.exec(
+        "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+        "WHERE TABLE_SCHEMA = DATABASE() "
+        "  AND TABLE_NAME   = 'role' "
+        "  AND COLUMN_NAME != 'id_role' "
+        "LIMIT 1"
+    );
+    return q.next() ? q.value(0).toString() : QStringLiteral("nom_role");
+}

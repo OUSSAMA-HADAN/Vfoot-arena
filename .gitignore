@@ -63,3 +63,20 @@ CMakeLists.txt.user*
 *.cbp
 *.layout
 *.depend
+admin/out/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+*.pro.user
+*.qmlc
+*.jsc
+.qmake.stash
+.qmake.cache
+*.dylib
+.vs/
+
+# ---------- Archives ----------
+*.zip
+*.tar.gz
