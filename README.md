@@ -3,22 +3,22 @@
 > eFootball tournament management platform: group stage, knockout bracket, score submission and dispute resolution.
 > *Projet de synthèse — 3ème année Génie Informatique, EHEI Oujda.*
 
-VFoot Arena is a **monorepo** of three applications that share one MySQL database:
+VFoot Arena is a group project made of three applications that share one MySQL database. Each application serves a different type of user:
 
-| Module | Folder | Stack | Who uses it |
-|---|---|---|---|
-| 🌐 **Player web app** | [`php/`](php/) | PHP 8.1+, MVC built from scratch (PSR-7/15, PHP-DI, League Route, Plates) | Players: register, join cups, submit scores, view trophies |
-| 🗂️ **Organizer console** | [`organisateur/`](organisateur/) | Java 21, Maven, MVP pattern, JDBC | Organizers: create cups, generate groups and brackets, resolve disputes |
-| 🛡️ **Admin desktop app** | [`admin/`](admin/) | C++17, Qt 6 / QML, MVVM | Admins: users, bans, cups, matches, trophies dashboard |
-| 🗄️ **Database** | [`database/`](database/) | MySQL / MariaDB | Shared schema + seed data |
+| Module | Folder | Stack | Who uses it | Built by |
+|---|---|---|---|---|
+| 🌐 **Player web app** | [`php/`](php/) | PHP 8.2, MVC built from scratch | Players: register, join cups, submit scores, view trophies | **Me** ([@OUSSAMA-HADAN](https://github.com/OUSSAMA-HADAN)) |
+| 🗂️ **Organizer console** | [`organisateur/`](organisateur/) | Java 21, Maven, MVP pattern, JDBC | Organizers: create cups, generate groups and brackets, resolve disputes | Teammate |
+| 🛡️ **Admin desktop app** | [`admin/`](admin/) | C++17, Qt 6 / QML, MVVM | Admins: users, bans, cups, matches, trophies | Teammate |
+| 🗄️ **Database** | [`database/`](database/) | MySQL / MariaDB | Shared by all three apps | Shared |
 
 ---
 
 ## How a tournament works
 
-1. **Group stage**: players are split into groups of 4–5 and play round-robin (win 3 pts, draw 1, loss 0). The top 2 of each group qualify.
-2. **Knockout stage**: single elimination, generated automatically (round of 16 → final).
-3. **Scores**: both players submit the result. If the two submissions match, the score is confirmed. If they differ, a **dispute** is opened and the organizer decides.
+1. **Group stage:** players are split into groups of 4–5 and play round-robin (win 3 pts, draw 1, loss 0). The top 2 of each group qualify.
+2. **Knockout stage:** single elimination, generated automatically (round of 16 → final).
+3. **Scores:** both players submit the result. If the two submissions match, the score is confirmed. If they differ, a **dispute** is opened and the organizer decides.
 
 ```
           ┌──────────────┐   ┌────────────────┐   ┌──────────────┐
@@ -33,73 +33,49 @@ VFoot Arena is a **monorepo** of three applications that share one MySQL databas
 
 ---
 
-## Repository layout
+## My contribution
 
+My main task was the **player web application** ([`php/`](php/)), the part of the platform used by its main user: **the player**.
+
+I built it in **PHP 8.2** on an MVC framework I wrote from scratch, without Laravel or Symfony.
+
+### Features
+- **Authentication:** register and login with bcrypt-hashed passwords, sessions, and middleware that protects private pages
+- **Cups:** browse tournaments, see their details, join one directly or with an invite code
+- **Matches:** list my matches and submit scores. Matching submissions are confirmed automatically; differing ones become a dispute for the organizer.
+- **Profile:** player profile and won trophies
+
+### Architecture
 ```
-vfoot/
-├── php/            Player web app (PHP MVC)
-├── organisateur/   Organizer console app (Java / Maven)
-├── admin/          Admin desktop app (C++ / Qt 6)
-├── database/       Schema (efootball_tournament_v2.sql) + seed data
-└── test/           Standalone PHP scripts for testing the DB pipeline
+Request → public/index.php → Middleware (auth) → Router → Controller
+                                                            │
+                                           Repository → Mapper → Entity
+                                                            │
+                                                  Plates view → Response
 ```
+- **Front controller:** every request goes through a single entry point, `public/index.php`
+- **PSR-7 / PSR-15:** standard HTTP request and response objects, and a middleware pipeline
+- **Dependency injection** with PHP-DI (PSR-11)
+- **Routing** with League Route, **templates** with League Plates
+- **Repository + Data Mapper:** SQL stays in repositories, mappers turn database rows into entities, and there is no ORM
+- **Configuration** from an environment file, so no credentials live in the code
 
 ---
 
-## Quick start
+## What I learned
 
-### 1. Database
-```bash
-mysql -u root -p < database/efootball_tournament_v2.sql
-mysql -u root -p < database/seed.sql          # optional demo data
-```
-See [`database/README.md`](database/README.md).
-
-### 2. Each app
-| App | Guide |
-|---|---|
-| Web (PHP) | [`php/README.md`](php/README.md) |
-| Organizer (Java) | [`organisateur/README.md`](organisateur/README.md) |
-| Admin (C++/Qt) | [`admin/README.md`](admin/README.md) |
-
-### Demo accounts (from `seed.sql`, local use only)
-| Email | Role |
-|---|---|
-| `admin@vfoot.com` | admin |
-| `org@vfoot.com` | organizer |
-| `p1@vfoot.com` … `p6@vfoot.com` | players |
-
-Password for every demo account: `00000000`. **Never reuse these accounts in a real deployment.**
+- **How a web framework works inside:** building routing, middleware, dependency injection and templating myself showed me what frameworks like Laravel do for you.
+- **Following PHP standards (PSR):** using PSR-7, PSR-11 and PSR-15 made my code work with third-party libraries instead of being tied to my own classes.
+- **Separating responsibilities:** controllers handle HTTP, repositories handle SQL, and mappers and entities handle data. This made features easier to add and bugs easier to find.
+- **Web security basics:** password hashing with bcrypt, session-based authentication, prepared statements against SQL injection, and keeping secrets out of the source code.
+- **Designing around business rules:** turning the tournament rules (double score submission, disputes, group qualification) into data and code.
+- **Teamwork on a shared database:** three apps in three languages, built by different people, all depending on the same schema. Changes had to be agreed on and coordinated through Git.
 
 ---
 
-## Configuration and secrets 🔒
+## Other parts of the project (teammates)
 
-No credentials are stored in the code. Each app reads them from a local, **git-ignored** file or from environment variables:
+The **organizer console (Java)** and the **admin desktop app (C++/Qt)** were built by **my teammates** in the project group. They are described here so the whole platform makes sense, but they are not my work.
 
-| App | Committed template | Your local file (ignored) | Env vars |
-|---|---|---|---|
-| PHP | `php/.env.example` | `php/.env` | via `.env` |
-| Java | `organisateur/src/main/resources/config.properties.example` | `config.properties` | `DB_URL`, `DB_USER`, `DB_PASSWORD` |
-| C++ | n/a | n/a | `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD` |
-| test/ | n/a | n/a | `DB_HOST`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD` |
-
-If no value is set, each app falls back to the local XAMPP defaults (`root`, empty password).
-
----
-
-## Branches and versions
-
-| Branch | Purpose |
-|---|---|
-| `main` | Stable, demo-ready code. Each release is tagged (`v1.0.0`, …). |
-| `dev` | Integration branch. Feature branches are merged here first. |
-| `feature/<name>` | One branch per feature, merged into `dev` through a pull request. |
-
-Releases are listed on the [Releases](../../releases) page.
-
----
-
-## License
-
-Academic project. All rights reserved by the authors unless a license file is added.
+- **Organizer console:** a Java console app in the MVP pattern. Organizers create cups, follow group standings, generate the knockout bracket and resolve score disputes.
+- **Admin desktop app:** a Qt 6 / QML desktop app in the MVVM pattern. Admins manage users (ban and unban), supervise cups, groups and matches, and manage trophies from a dashboard.

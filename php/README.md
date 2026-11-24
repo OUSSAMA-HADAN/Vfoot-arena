@@ -1,5 +1,7 @@
 # 🌐 VFoot Arena — Player web app (PHP)
 
+> 👤 **My part of the project.** I designed and built this application.
+
 Web interface for players, built on a hand-rolled MVC framework (no Laravel or Symfony).
 
 ## Features
@@ -9,7 +11,7 @@ Web interface for players, built on a hand-rolled MVC framework (no Laravel or S
 - Profile page and trophies
 
 ## Stack
-PHP 8.1+ · PSR-7 / PSR-15 middleware · PHP-DI (PSR-11) · League Route · League Plates · vlucas/phpdotenv · Repository + Data Mapper (no ORM)
+PHP 8.2 (8.1+ required) · PSR-7 / PSR-15 middleware · PHP-DI (PSR-11) · League Route · League Plates · vlucas/phpdotenv · Repository + Data Mapper (no ORM)
 
 ## Structure
 ```
@@ -37,14 +39,3 @@ php/
 | GET | `/matches`, `/matches/{id}` | yes |
 | POST | `/matches/{id}/score` | yes |
 | GET | `/profile`, `/profile/trophees` | yes |
-
-## Run locally
-```bash
-cd php
-composer install
-cp .env.example .env      # then edit your DB credentials
-composer serve            # http://localhost:7010
-```
-Import the database first, see [`../database/README.md`](../database/README.md).
-
-> 🔒 `.env` is git-ignored. Only `.env.example` (no real values) is committed.
